@@ -1,0 +1,63 @@
+﻿@model Digisoft.Sales.Models.AddEditBiddingViewModel
+
+<div class="form-horizontal">
+    @Html.HiddenFor(model => model.Id)
+    <div class="form-group" id="teamlead_outter">
+        <label class="control-label">Team Lead</label>
+        <div class="">
+            @Html.DropDownListFor(x => Model.TeamLeadId, new SelectList(Model.TeadLeads, "Value", "Text", ""), "-select-", htmlAttributes: new { @class = "form-control", id = "ddlTeamLeads" })
+            @Html.ValidationMessageFor(model => model.TeamLeadId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="text-right mt-2">
+        <div class="">
+            <a href="#" class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</a>
+            <input type="submit" value="Save" id="btnSave" class="btn btn-primary" />
+        </div>
+    </div>
+
+    <script>
+        $("#btnSave").click(function () {
+            var teamLeadId = $("#ddlTeamLeads").val();
+            var vm = {};
+            vm.Id = $("#Id").val();
+            vm.TeamLeadId = teamLeadId;
+            var validate = true;
+
+            if (teamLeadId == undefined || teamLeadId == "") {
+                validate = false;
+                $("#ddlTeamLeads").addClass("error");
+            } else {
+                $("#ddlTeamLeads").removeClass("error");
+            }
+
+            if (validate == true) {
+                loader();
+                $.ajax({
+                    type: "Post",
+                    url: "/Bidding/InsertUpdateTeamLead",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(vm),
+                    success: function (result) {
+                        if (result.Success) {
+                            $('#myModal').hide();
+                            removeLoader();
+                            notificationHelper.ShowSuccess(result.Message);
+                            setTimeout(function () {
+                                location.href = "/Bidding/Index";
+                            }, 1000);
+                        } else {
+                            notificationHelper.ShowError("Sorry, An error occurred!");
+                            removeLoader();
+                        }
+                    },
+                    failure: function (result) {
+                        notificationHelper.ShowError(result.responseText);
+                        removeLoader();
+                    }
+                });
+            }
+        });
+    </script>

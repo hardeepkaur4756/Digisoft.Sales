@@ -1,0 +1,636 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css">
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js"></script>
+@*<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.4.2/js/buttons.print.min.js"></script>*@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.css" integrity="sha512-SUJFImtiT87gVCOXl3aGC00zfDl6ggYAw5+oheJvRJ8KBXZrr/TMISSdVJ5bBarbQDRC2pR5Kto3xTR0kpZInA==" crossorigin="anonymous" />
+@*XYZ*@
+
+@*<div class="row">
+        <div class="col-md-6">
+            <div class="form">
+                <div class="form-group mb-5">
+                    <label class="control-label">Date</label>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" id="chartDate" />
+                        </div>
+                        <div class="col-md-6">
+                            <input type="submit" value="Load" id="btnLoad" class="btn btn-primary" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>*@
+
+<!-- Used Conntects pieChart Start-->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3">
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            Progress Overview
+                        </h6>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="pull-right form-control" id="chartDate" placeholder="Select Year" />
+                    </div>
+                    @*<div class="col-md-2">
+                            <input type="submit" value="Load" id="btnLoad" class="btn btn-primary" />
+                        </div>*@
+                </div>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-area" id="chart-container">
+                    <canvas id="pieChart"></canvas>
+                    <div id="warningIcon" class="d-none"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></div>
+                    <p id="pieChartDesc" class="text-center mb-0"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Used Conntects pieChart End-->
+    <!-- Bidders Performance Bar Chart Start-->
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            Bidders Performance Overview
+                        </h6>
+                    </div>
+                    <div class="col-md-4"><input type="text" class="pull-right form-control" id="progressDateForBarChart" placeholder="Select Time Period" /></div>
+                </div>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-area" id="Bar-chart-container">
+                    <canvas id="barChart"></canvas>
+                    <br>
+                    <div id="warningIcon" class="d-none"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></div>
+                    @*<p id="pieChartDesc" class="text-center mb-0"></p>*@
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bidders Performance Bar Chart End-->
+</div>
+
+<!-- Billing Payment pieChart Start-->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3">
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            Billing Overview
+                        </h6>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="pull-right form-control" id="billingChartDate" placeholder="Select Year" />
+                    </div>
+                    @*<div class="col-md-2">
+                            <input type="submit" value="Load" id="btnLoad" class="btn btn-primary" />
+                        </div>*@
+                </div>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-area" id="billing-chart-container">
+                    <canvas id="billingPieChart"></canvas>
+
+                    <div id="warningIcon2" class="d-none"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></div>
+                    <p id="billingPieChartDesc" class="text-center mb-0"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Billing Payment pieChart End-->
+
+<br>
+<h4 class="panel-title">
+    Filters
+</h4>
+<div class="row">
+    <div class="col-sm-3">
+        <input type="text" class="form-control" id="startDate" autocomplete="off" placeholder="Select Start Date" />
+    </div>
+    <div class="col-sm-3">
+        <input type="text" class="form-control" id="endDate" autocomplete="off" placeholder="Select End Date" />
+    </div>
+    @*<div class="col-sm-5">
+            @Html.DropDownListFor(x => Model.BiddersIds, new SelectList(Model.Bidders, "Value", "Text", ""), htmlAttributes: new { @data_placeholder = "Select Bidders...", @class = "form-control chosen", @id = "ddlBidder", multiple = "true" })
+        </div>*@
+    <div class="col-sm-1">
+        <input type="button" id="" class="btn btn-primary" value="Clear" data-isNew="true" onclick="clearFilters(this)" />
+    </div>
+</div>
+<table class="table table-responsive table-hover display" style="width:100%;" id="MyTable">
+    <thead class="thead-dark">
+        <tr>
+            <th>Bidder</th>
+            <th>Jobs</th>
+            <th>Connects Used</th>
+            <th>Reply</th>
+            <th>Hired</th>
+            @*<th>Action</th>*@
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var isFirstTime = true;
+
+        $("#chartDate").datepicker({
+            autoclose: true,
+            minViewMode: 1,
+            format: "mm/yyyy"
+        }).on('changeDate', function (selected) {
+            var str = selected.date.toString();
+            var date = new Date(str), mnth = ("0" + (date.getMonth() + 1)).slice(-2), day = ("0" + date.getDate()).slice(-2);
+            _loadBidContactsChart([date.getFullYear(), mnth, day].join("-"));
+            isFirstTime = false;
+        });
+        $("#chartDate").val(untilHelper.GetCurrentDateMonthYearFormat);
+
+        $("#billingChartDate").datepicker({
+            autoclose: true,
+            minViewMode: 1,
+            format: "mm/yyyy"
+        }).on('changeDate', function (selected) {
+            var str = selected.date.toString();
+            var date = new Date(str), mnth = ("0" + (date.getMonth() + 1)).slice(-2), day = ("0" + date.getDate()).slice(-2);
+            _loadBillingChart([date.getFullYear(), mnth, day].join("-"));
+            isFirstTime = false;
+        });
+        $("#billingChartDate").val(untilHelper.GetCurrentDateMonthYearFormat);
+
+        $("#progressDateForBarChart").datepicker({
+            autoclose: true,
+            minViewMode: 1,
+            format: 'mm/yyyy'
+        }).on('changeDate', function (selected) {
+            var str = selected.date.toString();
+            var date = new Date(str), mnth = ("0" + (date.getMonth() + 1)).slice(-2), day = ("0" + date.getDate()).slice(-2);
+            _loadBarChart([date.getFullYear(), mnth, day].join("-"));
+            isFirstTime = false;
+        });
+        $("#progressDateForBarChart").val(untilHelper.GetCurrentDateMonthYearFormat);
+
+        _loadBidContactsChart();
+        if (isFirstTime) {
+            _loadBarChart();
+            _loadBillingChart();
+        }
+
+        //Grid date pickers
+        var isFirstTime = true;
+        var startDate = new Date();
+        var FromEndDate = new Date();
+
+        $("#startDate").datepicker({
+            autoclose: true,
+            minViewMode: 0,
+            //format: "dd/mm/yyyy"
+            format: "yyyy-mm-dd"
+        }).on('changeDate', function (selected) {
+            startDate = new Date(selected.date.valueOf());
+            startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+            $('#endDate').datepicker('setStartDate', startDate);
+            var edate = $('#endDate').val()
+            if (edate == undefined || edate == "") {
+                $("#endDate").addClass("error");
+                $("#endDate").val("");
+                return false;
+            } else {
+                $("#endDate").removeClass("error");
+                _loadData();
+                isFirstTime = false;
+            }
+        });
+        //$("#startDate").val(untilHelper.GetCurrentDateMonthYearFormat);
+
+        $("#endDate").datepicker({
+            autoclose: true,
+            minViewMode: 0,
+            //format: 'dd/mm/yyyy'
+            format: "yyyy-mm-dd"
+        }).on('changeDate', function (selected) {
+            var sdate = $('#startDate').val()
+            if (sdate == undefined || sdate == "") {
+                $("#startDate").addClass("error");
+                $("#endDate").val("");
+                return false;
+            } else {
+                $("#endDate").removeClass("error");
+                $("#startDate").removeClass("error");
+                FromEndDate = new Date(selected.date.valueOf());
+                FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                $('#startDate').datepicker('setEndDate', FromEndDate);
+                _loadData();
+                isFirstTime = false;
+            }
+        });
+        //$("#endDate").val(untilHelper.GetCurrentDateMonthYearFormat);
+
+        loader();
+        if (isFirstTime) {
+            _loadData();
+        }
+        removeLoader();
+    });
+
+    $("#btnLoad").click(function () {
+        var date = $("#chartDate").val();
+        var validate = true;
+        if (date == undefined || date == "") {
+            validate = false;
+            $("#chartDate").addClass("error");
+        } else {
+            $("#chartDate").removeClass("error");
+        }
+        if (validate == true) {
+            _loadBidContactsChart(date)
+        }
+    });
+
+    var _loadBidContactsChart = function (even) {
+        if (even == undefined || even == "") {
+            var d = new Date(),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+
+            if (month.length < 2)
+                month = '0' + month;
+            if (day.length < 2)
+                day = '0' + day;
+            even = [year, month, day].join('-');
+        }
+        loader();
+        $.ajax({
+            type: "Get",
+            url: "/Bidding/GetTotalContact",
+            data: { "Date": even },
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                if (response.Success) {
+                    if (response.TotalCount > 0) {
+                        $("#warningIcon").addClass("d-none");
+                        $('#pieChart').remove(); // this is my <canvas> element
+                        $('#chart-container').append('<canvas id="pieChart"><canvas>');
+                        $("#pieChartDesc").html("Used Connects information");
+                        bindChart(response);
+                    }
+                    else {
+                        $('#pieChart').remove(); // this is my <canvas> element
+                        $('#chart-container').append('<canvas id="pieChart"><canvas>');
+                        $("#warningIcon").removeClass("d-none");
+                        $("#pieChartDesc").html("Sorry! No record found...");
+                    }
+                    removeLoader();
+                }
+                else {
+                    notificationHelper.ShowError("Some thing went wrong !");
+                    removeLoader();
+                }
+            },
+            error: function (result) {
+                notificationHelper.ShowError(result.Message);
+                removeLoader();
+            }
+        });
+    };
+
+    var bindChart = function (reponse) {
+        var aData = reponse.data;
+        var aLabels = aData.Labels;
+        var aTotalContactList = aData.TotalContactList;
+        //var aDatasets1 = aData[1];
+        //var aDatasets2 = aData[2];
+
+        var config = {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: aTotalContactList,
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(255, 159, 64)',
+                        'rgb(255, 205, 86)',
+                        'rgb(75, 192, 192)',
+                        'rgb(54, 162, 235)',
+                        'rgb(153, 102, 255)',
+                        'rgb(201, 203, 207)'
+                    ],
+                    label: 'dataset 1',
+                },
+                ],
+                labels: aLabels
+            }
+            ,
+            options: {
+                responsive: true
+            }
+        };
+
+        //initiate the new chart
+        var ctx = $("#pieChart").get(0).getContext('2d');
+        ctx.canvas.height = 300;  // setting height of canvas
+        ctx.canvas.width = 500; // setting width of canvas
+        var pieChart = new Chart(ctx, config);
+    }
+
+
+    //Billing Pie Chart
+    $("#btnLoadBilling").click(function () {
+        var date = $("#billingChartDate").val();
+        var validate = true;
+        if (date == undefined || date == "") {
+            validate = false;
+            $("#billingChartDate").addClass("error");
+        } else {
+            $("#billingChartDate").removeClass("error");
+        }
+        if (validate == true) {
+            _loadBillingChart(date)
+        }
+    });
+
+    var _loadBillingChart = function (even) {
+        if (even == undefined || even == "") {
+            var d = new Date(),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+
+            if (month.length < 2)
+                month = '0' + month;
+            if (day.length < 2)
+                day = '0' + day;
+            even = [year, month, day].join('-');
+        }
+        loader();
+        $.ajax({
+            type: "Get",
+            url: "/Home/GetBiddersBillings",
+            data: { "Date": even },
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                if (response.Success) {
+                    if (response.TotalCount > 0) {
+                        $("#warningIcon2").addClass("d-none");
+                        $('#billingPieChart').remove(); // this is my <canvas> element
+                        $('#billing-chart-container').append('<canvas id="billingPieChart"><canvas>');
+                        $("#billingPieChartDesc").html("Bidders Billing information");
+                        bindBillingChart(response);
+                    }
+                    else {
+                        $('#billingPieChart').remove(); // this is my <canvas> element
+                        $('#billing-chart-container').append('<canvas id="billingPieChart"><canvas>');
+                        $("#warningIcon2").removeClass("d-none");
+                        $("#billingPieChartDesc").html("Sorry! No record found...");
+                    }
+                    removeLoader();
+                }
+                else {
+                    notificationHelper.ShowError("Some thing went wrong !");
+                    removeLoader();
+                }
+            },
+            error: function (result) {
+                notificationHelper.ShowError(result.Message);
+                removeLoader();
+            }
+        });
+    };
+
+    //Bind Billibng pie Chart 
+     var bindBillingChart = function (reponse) {
+        var aData = reponse.data;
+        var aLabels = aData.Labels;
+         var aTotalContactList = aData.TotalPaidPercentage;
+        //var aDatasets1 = aData[1];
+        //var aDatasets2 = aData[2];
+
+        var config = {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: aTotalContactList,
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(255, 159, 64)',
+                        'rgb(255, 205, 86)',
+                        'rgb(75, 192, 192)',
+                        'rgb(54, 162, 235)',
+                        'rgb(153, 102, 255)',
+                        'rgb(201, 203, 207)'
+                    ],
+                    label: 'dataset 1',
+                },
+                ],
+                labels: aLabels
+            }
+            ,
+            options: {
+                responsive: true
+            }
+        };
+
+        //initiate the new chart
+        var ctx = $("#billingPieChart").get(0).getContext('2d');
+        ctx.canvas.height = 300;  // setting height of canvas
+        ctx.canvas.width = 500; // setting width of canvas
+        var billingPieChart = new Chart(ctx, config);
+    }
+
+    //Get Performance Data for all Bidders start
+    var _loadBarChart = function (even) {
+        if (even == undefined || even == "") {
+            var d = new Date(),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+
+            if (month.length < 2)
+                month = '0' + month;
+            if (day.length < 2)
+                day = '0' + day;
+            even = [year, month, day].join('-');
+        }
+        loader();
+        $.ajax({
+            type: "Get",
+            url: "/Home/GetAllBidderPerformanceData",
+            data: { "Date": even },
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                if (response.Success) {
+                    $('#barChart').remove(); // this is my <canvas> element
+                    $('#Bar-chart-container').append('<canvas id="barChart"><canvas>');
+                    bindBarChart(response);
+                    removeLoader();
+                }
+                else {
+                    notificationHelper.ShowError("Some thing went wrong !");
+                    removeLoader();
+                }
+            },
+            error: function (result) {
+                notificationHelper.ShowError(result.Message);
+                removeLoader();
+            }
+        });
+    };
+
+    var bindBarChart = function (reponse) {
+        var config = {
+            type: 'bar',
+            data: {
+                labels: reponse.data.Labels,
+                datasets: reponse.data.Datasets,
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Bidders Progress Chart'
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Bidders'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            stacked: true,
+                            display: true,
+                            labelString: 'Value'
+                        }
+                    }]
+                }
+            }
+        };
+
+        //initiate the new chart
+        var ctx = $("#barChart").get(0).getContext('2d');
+        ctx.canvas.height = 300;  // setting height of canvas
+        ctx.canvas.width = 500; // setting width of canvas
+        var progressChart = new Chart(ctx, config);
+    }
+    //Get Performance Data for all Bidders end
+
+    //Get the record for grid start
+
+    var oTable;
+
+    var _loadData = function (response) {
+        if ($.fn.DataTable.isDataTable("#MyTable")) {
+            oTable.draw();
+        }
+        else {
+            oTable =
+                $('#MyTable').DataTable({
+                    //"aaData":response,
+                    "bServerSide": true,
+                    "sAjaxSource": "/Home/GetList",
+                    "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+                        //var colName = oSettings.aoColumns[oSettings.aaSorting[0][0]].mData;
+                        //var sDir = oSettings.aaSorting[0][1];
+                        //var bidders = $(".chosen").val();
+                        var sDate = $("#startDate").val();
+                        var eDate = $("#endDate").val();
+
+                        //aoData.push({ "name": "sortCol", "value": colName });
+                        //aoData.push({ "name": "sortDir", "value": sDir });
+                        //aoData.push({ "name": "ids", "value": bidders });
+                        aoData.push({ "name": "startDate", "value": sDate });
+                        aoData.push({ "name": "endDate", "value": eDate });
+                        $.ajax({
+                            type: "Get",
+                            data: aoData,
+                            url: sSource,
+                            success: fnCallback
+                        })
+                    },
+                    "aoColumns": [
+                        { "mData": "BidderName" },
+                        { "mData": "Jobs" },
+                        { "mData": "ConnectsUsed" },
+                        { "mData": "Replies" },
+                        { "mData": "Hires" },
+                    ],
+                    "aoColumnDefs": [
+                        { "bSortable": false, "aTargets": [0, 1, 2, 3, 4] }
+                    ],
+                    "dom": '<"top pull-right"B>rt<"bottom"iflp><"clear">',
+                    buttons: [
+                        {
+                            extend: "csv",
+                            text: "Export",
+                            autoFilter: true,
+                            sheetName: 'Exported data'
+                        }
+                    ],
+                    bProcessing: true,
+                    pageLength: 10,
+                    "paging": true,
+                    bSearching: false,
+                    "searching": false,
+                    bLengthChange: false,
+                    "language": {
+                        "zeroRecords": "Not found - Sorry",
+                        "info": "Page _PAGE_ of _PAGES_",
+                        "infoEmpty": "No records",
+                        "processing": "Processing... Please wait",
+                    },
+                });
+        }
+        removeLoader();
+    };
+
+    var clearFilters = function () {
+        $("#startDate").val("");
+        $("#endDate").val("");
+        _loadData();
+    }
+//Get the record for grid end
+</script>
+

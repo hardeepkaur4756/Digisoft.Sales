@@ -1,0 +1,359 @@
+﻿@model Digisoft.Sales.Models.AddEditBiddingViewModel
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.GetReply)
+
+
+        @if (Model.ViewType == "Display")
+        {
+            <div class="form-group d-flex">
+                <label class="col-sm-3 control-label">Title</label>
+                <div class="col-sm-9">
+                    @Html.DisplayFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="col-sm-3 control-label">Proposal Url</label>
+                <div class="col-sm-9 text-break">
+                    @Html.DisplayFor(model => model.ProposalUrl, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="col-sm-3 control-label">Platform</label>
+                <div class="col-sm-9">
+                    @Html.DisplayFor(x => Model.PlatformName, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="col-sm-3 control-label">Applied Under</label>
+                <div class="col-sm-9">
+                    @Html.DisplayFor(x => Model.AppliedUnderName, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="col-sm-3 control-label">Developer</label>
+                <div class="col-sm-9">
+                    @Html.DisplayFor(x => Model.DeveloperName, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="col-sm-3 control-label">Project Type</label>
+                <div class="col-sm-9">
+                    @Html.DisplayFor(x => Model.ProjectTypeName, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="col-sm-3 control-label">Technology</label>
+                <div class="col-sm-9">
+                    @Html.DisplayFor(x => Model.TechnologyName, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="col-sm-3 control-label">Price</label>
+                <div class="col-sm-9">
+                    @Html.DisplayFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="col-sm-3 control-label">Notes</label>
+                <div class="col-sm-9">
+                    @Html.DisplayFor(model => model.Notes, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="col-sm-3 control-label">Connects Used</label>
+                <div class="col-sm-9">
+                    @Html.DisplayFor(model => model.ConnectsUsed, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="col-sm-3 control-label">Applied On</label>
+                <div class="col-sm-9">
+                    @{
+                        var appliedDate = Model.AppliedOn!=null?Model.AppliedOn.ToString("dd MMM yyyy"):"";
+                        <label class="control-label"> @appliedDate </label>
+                    }
+                   @* @Html.DisplayFor(model => model.AppliedDate, new { htmlAttributes = new { @class = "form-control" } });*@
+                </div>
+            </div>
+
+            <div class="text-right mt-2">
+                <div class="col-sm-12">
+                    <a href="#" class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Close</a>
+                    @* <input type="submit" value="Save" id="btnSaveBid" class="btn btn-primary" />*@
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <label class="control-label">Title</label>
+                <div class="form-group">
+                    @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            @*<div class="form-group">
+                <label class="control-label col-md-2">Job Url</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.JobUrl, new { htmlAttributes = new { @class = "form-control", } })
+                    @Html.ValidationMessageFor(model => model.JobUrl, "", new { @class = "text-danger" })
+                </div>
+            </div>*@
+
+            <div class="form-group">
+                <label class="control-label">Proposal Url</label>
+                <div class="">
+                    @Html.EditorFor(model => model.ProposalUrl, new { htmlAttributes = new { @class = "form-control text-break" } })
+                    @Html.ValidationMessageFor(model => model.ProposalUrl, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Platform</label>
+                <div class="">
+                    @Html.DropDownListFor(x => Model.PlatformId, new SelectList(Model.Platforms, "Value", "Text", ""), "- Please select Platform", htmlAttributes: new { @class = "form-control", id = "ddlPlatforms" })
+                    @Html.ValidationMessageFor(model => model.PlatformId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Applied Under</label>
+                <div class="">
+                    @Html.DropDownListFor(x => Model.AppliedUnderId, new SelectList(Model.AppliedUnders, "Value", "Text", ""), "- Please select AppliedUnder", htmlAttributes: new { @class = "form-control", id = "ddlAppliedUnder" })
+                    @Html.ValidationMessageFor(model => model.AppliedUnderId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Developer</label>
+                <div class="">
+                    @Html.DropDownListFor(x => Model.DeveloperId, new SelectList(Model.Developers, "Value", "Text", ""), "- Please select Developer", htmlAttributes: new { @class = "form-control", id = "ddlDevelopers" })
+                    @Html.ValidationMessageFor(model => model.DeveloperId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Project Type</label>
+                <div class="">
+                    @Html.DropDownListFor(x => Model.ProjectTypeId, new SelectList(Model.ProjectTypes, "Value", "Text", ""), "- Please select Project Type", htmlAttributes: new { @class = "form-control", id = "ddlProjectType" })
+                    @Html.ValidationMessageFor(model => model.ProjectTypeId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Technology</label>
+                <div class="">
+                    @Html.DropDownListFor(x => Model.TechnologyId, new SelectList(Model.Technologies, "Value", "Text", ""), "- Please select Technology", htmlAttributes: new { @class = "form-control", id = "ddlTechnology" })
+                    @Html.ValidationMessageFor(model => model.TechnologyId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Price</label>
+                <div class="">
+                    @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Notes</label>
+                <div class="">
+                    @Html.EditorFor(model => model.Notes, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Connects Used</label>
+                <div class="">
+                    @Html.EditorFor(model => model.ConnectsUsed, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.ConnectsUsed, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Applied On</label>
+                <div class="">
+                    @Html.EditorFor(model => model.AppliedOn, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+
+            <div class="text-right mt-2">
+                <div class="">
+                    <a href="#" class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</a>
+                    <input type="submit" value="Save" id="btnSaveBid" class="btn btn-primary" />
+
+                </div>
+            </div>
+        }
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#AppliedOn").datepicker({
+                autoclose: true,
+                format: "yyyy-mm-dd"
+            });
+            if ($("#Id").val() == 0) {
+                $("#AppliedOn").val("");
+            }
+        });
+
+        //show Hide on the base of get reply
+        var showHideTeam = function (e) {
+            if (e == 0) {
+                $("#teamlead_outter").addClass("d-none");
+            }
+            if (e == 1) {
+                $("#teamlead_outter").removeClass("d-none");
+            }
+        }
+
+        $("#Price").keyup(function (evt) {
+            var self = $(this);
+            self.val(self.val().replace(/[^0-9\.]/g, ''));
+            if ((evt.which != 46 || self.val().indexOf('.') != -1) && (evt.which < 48 || evt.which > 57)) {
+                evt.preventDefault();
+            }
+        });
+        function ValidateUrl(Url) {
+            if (/^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/.test(Url)) {
+                return true
+            } else {
+                return false
+            }
+        }
+
+        $("#btnSaveBid").click(function () {
+            var title = $("#Title").val();
+            var proposalUrl = $("#ProposalUrl").val();
+            var platformId = $("#ddlPlatforms").val();
+            var AppliedUnderId = $("#ddlAppliedUnder").val();
+            var DeveloperId = $("#ddlDevelopers").val();
+            var ProjectTypeId = $("#ddlProjectType").val();
+            var TechnologyId = $("#ddlTechnology").val();
+            var Price = $("#Price").val();
+            var Notes = $("#Notes").val();
+            var AppliedOn = $("#AppliedOn").val();
+            var ConnectsUsed = $("#ConnectsUsed").val();
+            var teamLeadId = $("#ddlTeamLeads").val();
+            var vm = {};
+            vm.Id = $("#Id").val();
+            vm.Title = title;
+            vm.ProposalUrl = proposalUrl;
+            vm.PlatformId = platformId;
+            vm.AppliedUnderId = AppliedUnderId;
+            vm.DeveloperId = DeveloperId;
+            vm.ProjectTypeId = ProjectTypeId;
+            vm.TechnologyId = TechnologyId;
+            vm.Price = Price;
+            vm.Notes = Notes;
+            vm.AppliedOn = AppliedOn;
+            vm.ConnectsUsed = ConnectsUsed;
+            vm.TeamLeadId = teamLeadId;
+            var validate = true;
+            if (title == undefined || title == "") {
+                validate = false;
+                $("#Title").addClass("error");
+            } else {
+                $("#Title").removeClass("error");
+            }
+
+            if ((proposalUrl == undefined || proposalUrl == "") || ValidateUrl(proposalUrl) == false) {
+                validate = false;
+                $("#ProposalUrl").addClass("error");
+            } else {
+                $("#ProposalUrl").removeClass("error");
+            }
+
+            if (platformId == undefined || platformId == "") {
+                validate = false;
+                $("#ddlPlatforms").addClass("error");
+            } else {
+                $("#ddlPlatforms").removeClass("error");
+            }
+            if (AppliedUnderId == undefined || AppliedUnderId == "") {
+                validate = false;
+                $("#ddlAppliedUnder").addClass("error");
+            } else {
+                $("#ddlAppliedUnder").removeClass("error");
+            }
+            if (DeveloperId == undefined || DeveloperId == "") {
+                validate = false;
+                $("#ddlDevelopers").addClass("error");
+            } else {
+                $("#ddlDevelopers").removeClass("error");
+            }
+            if (ProjectTypeId == undefined || ProjectTypeId == "") {
+                validate = false;
+                $("#ddlProjectType").addClass("error");
+            } else {
+                $("#ddlProjectType").removeClass("error");
+            }
+            if (TechnologyId == undefined || TechnologyId == "") {
+                validate = false;
+                $("#ddlTechnology").addClass("error");
+            } else {
+                $("#ddlTechnology").removeClass("error");
+            }
+            if (Price == undefined || Price == "" || Price == "0.00" || Price == "0") {
+                validate = false;
+                $("#Price").addClass("error");
+            } else {
+                $("#Price").removeClass("error");
+            }
+            if (AppliedOn == undefined || AppliedOn == "") {
+                validate = false;
+                $("#AppliedOn").addClass("error");
+            } else {
+                $("#AppliedOn").removeClass("error");
+            }
+            if (ConnectsUsed == undefined || ConnectsUsed == 0) {
+                validate = false;
+                $("#ConnectsUsed").addClass("error");
+            } else {
+                $("#ConnectsUsed").removeClass("error");
+            }
+
+            if (validate == true) {
+                loader();
+                $.ajax({
+                    type: "Post",
+                    url: "/Bidding/InsertUpdate",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(vm),
+                    success: function (result) {
+                        if (result.Success) {
+                            $('#myModal').hide();
+                            removeLoader();
+                            notificationHelper.ShowSuccess(result.Message);
+                            setTimeout(function () {
+                                location.href = "/Bidding/Index";
+                            }, 1000);
+                        } else {
+                            notificationHelper.ShowError("Sorry, An error occurred!");
+                            removeLoader();
+                        }
+                    },
+                    failure: function (result) {
+                        notificationHelper.ShowError(result.responseText);
+                        removeLoader();
+                    }
+                });
+            }
+        })
+    </script>

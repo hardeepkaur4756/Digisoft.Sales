@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="f1003586dbfb4133a75a6f86df80cba7" Name="Diagram1">
+        <EntityTypeShape EntityType="SalesModel.C__MigrationHistory" Width="1.5" PointX="7.75" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SalesModel.AspNetRole" Width="1.5" PointX="1.5" PointY="14.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SalesModel.AspNetUserClaim" Width="1.5" PointX="3" PointY="16.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SalesModel.AspNetUserLogin" Width="1.5" PointX="3" PointY="19.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SalesModel.AspNetUser" Width="1.5" PointX="0.75" PointY="9" IsExpanded="true" />
+        <EntityTypeShape EntityType="SalesModel.AppliedUnder" Width="1.5" PointX="0.75" PointY="17.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SalesModel.Client" Width="1.5" PointX="3" PointY="7.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SalesModel.Developer" Width="1.5" PointX="0.75" PointY="2.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SalesModel.Platform" Width="1.5" PointX="0.75" PointY="19.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SalesModel.ProjectType" Width="1.5" PointX="0.75" PointY="22.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SalesModel.TeamLead" Width="1.5" PointX="3" PointY="11.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SalesModel.Technology" Width="1.5" PointX="0.75" PointY="24.75" IsExpanded="true" />
+        <AssociationConnector Association="SalesModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
+        <AssociationConnector Association="SalesModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
+        <AssociationConnector Association="SalesModel.FK__Client__CreatedB__5EBF139D" ManuallyRouted="false" />
+        <AssociationConnector Association="SalesModel.AspNetUserRoles" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="SalesModel.ErrorLog" Width="1.5" PointX="3" PointY="23.125" />
+        <AssociationConnector Association="SalesModel.FK__ErrorLog__Create__656C112C" />
+        <EntityTypeShape EntityType="SalesModel.Job" Width="1.5" PointX="10.5" PointY="10.875" />
+        <AssociationConnector Association="SalesModel.FK_Job_AspNetUsers" />
+        <AssociationConnector Association="SalesModel.FK_Job_AppliedUnder" />
+        <AssociationConnector Association="SalesModel.FK_Job_Client" />
+        <AssociationConnector Association="SalesModel.FK_Job_Developer" />
+        <AssociationConnector Association="SalesModel.FK_Job_Platform" />
+        <AssociationConnector Association="SalesModel.FK_Job_ProjectType" />
+        <AssociationConnector Association="SalesModel.FK_Job_TeamLead" />
+        <EntityTypeShape EntityType="SalesModel.Billing" Width="1.5" PointX="7.5" PointY="10.75" />
+        <AssociationConnector Association="SalesModel.FK_Billing_AspNetUsers" />
+        <AssociationConnector Association="SalesModel.FK_Billing_Job" />
+        <EntityTypeShape EntityType="SalesModel.Bidding" Width="1.5" PointX="8.25" PointY="14.75" />
+        <AssociationConnector Association="SalesModel.FK__Bidding__UserId__31EC6D26" />
+        <AssociationConnector Association="SalesModel.FK__Bidding__Applied__35BCFE0A" />
+        <AssociationConnector Association="SalesModel.FK__Bidding__Develop__34C8D9D1" />
+        <AssociationConnector Association="SalesModel.FK__Bidding__Platfor__32E0915F" />
+        <AssociationConnector Association="SalesModel.FK__Bidding__Project__36B12243" />
+        <AssociationConnector Association="SalesModel.FK__Bidding__Technol__33D4B598" />
+        <AssociationConnector Association="SalesModel.FK_Bidding_TeamLead" />
+        <AssociationConnector Association="SalesModel.FK_Job_Bidding" />
+        <EntityTypeShape EntityType="SalesModel.UserDetail" Width="1.5" PointX="3" PointY="3.5" />
+        <AssociationConnector Association="SalesModel.FK_UserDetail_AspNetUsers" />
+        </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

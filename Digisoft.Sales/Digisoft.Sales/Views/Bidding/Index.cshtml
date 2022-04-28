@@ -1,0 +1,401 @@
+﻿@model Digisoft.Sales.Models.AddEditBiddingViewModel
+
+@{
+    ViewBag.Title = "Index";
+}
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+<style>
+    .chosen-container-multi .chosen-choices {
+        display: block;
+        width: 100%;
+        height: calc(1.5em + 0.75rem + 2px);
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #6e707e;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #d1d3e2;
+        border-radius: 0.35rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        background-image: none;
+    }
+
+    .chosen-container-active .chosen-choices li.search-field input[type="text"] {
+        color: #6e707e !important;
+    }
+</style>
+
+<h4 class="panel-title">
+    Filters
+</h4>
+<div class="row">
+    <div class="col-sm-3">
+        <input type="text" class="form-control" id="startDate" autocomplete="off" placeholder="Select Start Date" />
+    </div>
+    <div class="col-sm-3">
+        <input type="text" class="form-control" id="endDate" autocomplete="off" placeholder="Select End Date" />
+    </div>
+    <div class="col-sm-5">
+        @Html.DropDownListFor(x => Model.BiddersIds, new SelectList(Model.Bidders, "Value", "Text", ""), htmlAttributes: new { @data_placeholder = "Select Bidders...", @class = "form-control chosen", @id = "ddlBidder", multiple = "true" })
+    </div>
+    <div class="col-sm-1">
+        <input type="button" id="" class="btn btn-primary" value="Clear" data-isNew="true" onclick="clearFilters(this)" />
+    </div>
+</div>
+
+<input type="button" id="btnAddBidding" class="btn btn-primary common-btn" value="Add" data-isNew="true" onclick="AddOrEdit(this)" />
+<table class="table table-responsive table-hover display" style="width:100%;" id="MyTable">
+    <thead class="thead-dark">
+        <tr>
+            <th>Title</th>
+            <th>Technology</th>
+            <th>Connects</th>
+            <th>Applied From</th>
+            <th>Applied By</th>
+            <th>Platform</th>
+            <th class="">Team Lead</th>
+            <th>AppliedOn</th>
+            @*<td>Created Date</td>*@
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<script>
+
+    $(document).ready(function () {
+        $(".chosen").chosen({ no_results_text: "Oops, nothing found!" }).change(function () {
+            _loadData();
+        });
+
+        //date pickers
+        var isFirstTime = true;
+        var startDate = new Date();
+        var FromEndDate = new Date();
+
+        $("#startDate").datepicker({
+            autoclose: true,
+            minViewMode: 0,
+            //format: "dd/mm/yyyy"
+            format: "yyyy-mm-dd"
+        }).on('changeDate', function (selected) {
+            startDate = new Date(selected.date.valueOf());
+            startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+            $('#endDate').datepicker('setStartDate', startDate);
+
+            var edate = $('#endDate').val()
+            if (edate == undefined || edate == "") {
+                $("#endDate").addClass("error");
+                $("#endDate").val("");
+                return false;
+            } else {
+                $("#endDate").removeClass("error");
+                _loadData();
+                isFirstTime = false;
+            }
+        });
+        //$("#startDate").val(untilHelper.GetCurrentDateMonthYearFormat);
+
+        $("#endDate").datepicker({
+            autoclose: true,
+            minViewMode: 0,
+            //format: 'dd/mm/yyyy'
+            format: "yyyy-mm-dd"
+        }).on('changeDate', function (selected) {
+            var sdate = $('#startDate').val()
+            if (sdate == undefined || sdate == "") {
+                $("#startDate").addClass("error");
+                $("#endDate").val("");
+                return false;
+            } else {
+                $("#endDate").removeClass("error");
+                $("#startDate").removeClass("error");
+                FromEndDate = new Date(selected.date.valueOf());
+                FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                $('#startDate').datepicker('setEndDate', FromEndDate);
+                _loadData();
+                isFirstTime = false;
+            }
+        });
+        //$("#endDate").val(untilHelper.GetCurrentDateMonthYearFormat);
+
+        loader();
+        if (isFirstTime) {
+            _loadData();
+        }
+        removeLoader();
+    });
+    var oTable;
+
+    var _loadData = function (response) {
+        if ($.fn.DataTable.isDataTable("#MyTable")) {
+            oTable.draw();
+        }
+        else {
+            oTable =
+                $('#MyTable').DataTable({
+                    //"aaData":response,
+                    "bServerSide": true,
+                    "sAjaxSource": "/Bidding/GetList",
+                    "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+                        var colName = oSettings.aoColumns[oSettings.aaSorting[0][0]].mData;
+                        var sDir = oSettings.aaSorting[0][1];
+                        var bidders = $(".chosen").val();
+                        var sDate = $("#startDate").val();
+                        var eDate = $("#endDate").val();
+
+                        aoData.push({ "name": "sortCol", "value": colName });
+                        aoData.push({ "name": "sortDir", "value": sDir });
+                        aoData.push({ "name": "ids", "value": bidders });
+                        aoData.push({ "name": "startDate", "value": sDate });
+                        aoData.push({ "name": "endDate", "value": eDate });
+                        $.ajax({
+                            type: "Get",
+                            data: aoData,
+                            url: sSource,
+                            success: fnCallback
+                        })
+                    },
+                    "aoColumns": [
+                        { "mData": "Title" },
+                        { "mData": "TechnologyName" },
+                        { "mData": "ConnectsUsed" },
+                        { "mData": "AppliedUnderName" },
+                        { "mData": "UserName" },
+                        { "mData": "PlatformName" },
+                        { "mData": "TeamLead" },
+                        {
+                            "mData": "AppliedOn",
+                            "render": function (row, type, full) {
+                                var date = new Date(parseInt(full.AppliedOn.substr(6)));
+                                var month = date.getMonth() + 1;
+                                var formattedDate = date.getDate() + "/" + month + "/" + date.getFullYear();
+                                return formattedDate;
+                            }
+                        },
+                        {
+                            "mData": null,
+                            "render": function (row, type, full) {
+                                if (full.IsAdmin) {
+                                    var buttons = "<a class='icon-style' href='#' id='' data-id='" + full.Id + "' onclick='return ViewDetail(this)'><i class='fa fa-info-circle' aria-hidden='true'></i></a>";
+                                    buttons = "<a class='icon-style' href='#' id='' data-id='" + full.Id + "' onclick='return AddEditBiddingTeamLead(this)'><i class='fa fa-check' aria-hidden='true'></i></a>" + buttons;
+                                    buttons = "<a class='icon-style' href='#' id='' data-id='" + full.Id + "' onclick='return AddOrEdit(this)'> <i class='fa fa-pencil' aria-hidden='true'></i></a><a class='icon-style' href='#' id='' data-id='" + full.Id + "' onclick='return Delete(this)'><i class='fa fa-trash' aria-hidden='true'></i></a>" + buttons;
+                                }
+                                else {
+                                    var buttons = "<a class='icon-style' href='#' id='' data-id='" + full.Id + "' onclick='return ViewDetail(this)'><i class='fa fa-info-circle' aria-hidden='true'></i></a>";
+                                    if (full.IsCurrentUser) {
+                                        buttons = "<a class='icon-style' href='#' id='' data-id='" + full.Id + "' onclick='return AddEditBiddingTeamLead(this)'><i class='fa fa-check' aria-hidden='true'></i></a>" + buttons;
+                                        if (full.IsUnderDeleteTime) {
+                                            buttons = "<a class='icon-style' href='#' id='' data-id='" + full.Id + "' onclick='return AddOrEdit(this)'> <i class='fa fa-pencil' aria-hidden='true'></i></a><a class='icon-style' href='#' id='' data-id='" + full.Id + "' onclick='return Delete(this)'><i class='fa fa-trash' aria-hidden='true'></i></a>" + buttons;
+                                        }
+                                    } else {
+                                        return buttons;
+                                    }
+                                }
+                                return buttons;
+                            },
+                        },
+                    ],
+                    "aoColumnDefs": [
+                        { "bSortable": false, "aTargets": [8] }
+                    ],
+                    "order": [[7, "desc"]],
+                    bProcessing: true,
+                    pageLength: 10,
+                    "paging": true,
+                    bSearching: false,
+                    bLengthChange: false,
+                    "language": {
+                        "zeroRecords": "Not found - Sorry",
+                        "info": "Page _PAGE_ of _PAGES_",
+                        "infoEmpty": "No records",
+                        "processing": "Processing... Please wait",
+                    },
+                });
+        }
+        removeLoader();
+    };
+
+    var clearFilters = function () {
+        $("#startDate").val("");
+        $("#endDate").val("");
+        $(".chosen").val("").trigger('chosen:updated');
+        _loadData();
+    }
+
+    var AddOrEdit = function (event) {
+        var isNew = event.getAttribute("data-isNew");
+        var Id = parseInt(event.getAttribute("data-Id"));
+        if (Id == null || Id == undefined) {
+            notificationHelper.ShowError("Some thing went wrong!");
+        }
+        else {
+            loader();
+            if (isNew) {
+                Id = 0;
+            }
+            $.ajax({
+                type: "Get",
+                url: "/Bidding/AddBidding",
+                data: { id: Id },
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    if (response.Success) {
+                        if (Id > 0) {
+                            $('#myModal').find('#myModalLabel').html('Update Bid');
+                        }
+                        else {
+                            $('#myModal').find('#myModalLabel').html('Add Bid');
+                        }
+
+                        $('#myModal').find('.modal-body').html(response.Html);
+                        $('#myModal').find('.btn-primary').addClass('saveBid');
+                        $('#myModal').modal('show');
+                        removeLoader();
+                    }
+                    else {
+                        notificationHelper.ShowError('Sorry an error occured.')
+                        removeLoader();
+                    }
+                },
+                error: function (result) {
+                    notificationHelper.ShowError(result.Message);
+                    removeLoader();
+                }
+            });
+        }
+    }
+    var AddEditBiddingTeamLead = function (event) {
+        //var isNew = event.getAttribute("data-isNew");
+        var Id = parseInt(event.getAttribute("data-Id"));
+        if (Id == null || Id == undefined) {
+            notificationHelper.ShowError("Some thing went wrong!");
+        }
+        else {
+            loader();
+            //if (isNew) {
+            //Id = 0;
+            //}
+            $.ajax({
+                type: "Get",
+                url: "/Bidding/AddBiddingTeamLead",
+                data: { id: Id },
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    if (response.Success) {
+                        if (Id > 0) {
+                            $('#myModal').find('#myModalLabel').html('Update Team Lead');
+                        }
+                        else {
+                            $('#myModal').find('#myModalLabel').html('Add Team Lead');
+                        }
+
+                        $('#myModal').find('.modal-body').html(response.Html);
+                        $('#myModal').find('.btn-primary').addClass('saveBid');
+                        $('#myModal').modal('show');
+                        removeLoader();
+                    }
+                    else {
+                        notificationHelper.ShowError('Sorry an error occured.')
+                        removeLoader();
+                    }
+                },
+                error: function (result) {
+                    notificationHelper.ShowError(result.Message);
+                    removeLoader();
+                }
+            });
+        }
+    }
+
+    var ViewDetail = function (event) {
+        //var isNew = event.getAttribute("data-isNew");
+        var Id = parseInt(event.getAttribute("data-Id"));
+        if (Id == null || Id == undefined) {
+            notificationHelper.ShowError("Some thing went wrong!");
+        }
+        else {
+            loader();
+            //if (isNew) {
+            //Id = 0;
+            //}
+            $.ajax({
+                type: "Get",
+                url: "/Bidding/AddBidding",
+                data: { id: Id, "viewType": "Display" },
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    if (response.Success) {
+                        if (Id > 0) {
+                            $('#myModal').find('#myModalLabel').html('View Detail');
+                        }
+                        else {
+                            $('#myModal').find('#myModalLabel').html('View Detail');
+                        }
+
+                        $('#myModal').find('.modal-body').html(response.Html);
+                        $('#myModal').find('.btn-primary').addClass('saveBid');
+                        $('#myModal').modal('show');
+                        removeLoader();
+                    }
+                    else {
+                        notificationHelper.ShowError('Sorry an error occured.')
+                        removeLoader();
+                    }
+                },
+                error: function (result) {
+                    notificationHelper.ShowError(result.Message);
+                    removeLoader();
+                }
+            });
+        }
+    }
+
+    var Delete = function (event) {
+        var Id = parseInt(event.getAttribute("data-Id"));
+        if (Id == null || Id == undefined) {
+            notificationHelper.ShowError("Some thing went wrong!");
+        }
+        else {
+            if (confirm("Are you sure?")) {
+                loader()
+                $.ajax({
+                    type: "Get",
+                    url: "/Bidding/Delete",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: { Id: Id },
+                    success: function (result) {
+                        if (result.Success) {
+                            notificationHelper.ShowSuccess(result.Message);
+                            location.href = "/Bidding/Index";
+                            removeLoader();
+                        }
+                        else {
+                            if (result.IsInfo) {
+                                notificationHelper.ShowInfo(result.Message);
+                            }
+                            else {
+                                notificationHelper.ShowError(result.Message);
+                            }
+                            removeLoader();
+                        }
+                    },
+                    error: function (result) {
+                        notificationHelper.ShowError("Sorry, An error occurred!");
+                        removeLoader();
+                    }
+                });
+            }
+            return false;
+        }
+    }
+</script>
+

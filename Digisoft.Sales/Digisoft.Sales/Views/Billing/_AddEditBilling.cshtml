@@ -1,0 +1,244 @@
+﻿@model Digisoft.Sales.Models.BillingViewModel
+@using Digisoft.Sales.Utility.Enums
+
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.ProjectTypeId)
+
+        @if (Model.ViewType == "Display")
+        {
+            <div class="form-group d-flex">
+                @Html.LabelFor(model => model.JobId, htmlAttributes: new { @class = "control-label col-sm-3" })
+                <div class="col-sm-9 text-break">
+                    @Html.DisplayFor(model => model.JobTitle, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group d-flex">
+                @Html.LabelFor(model => model.BillingDate, htmlAttributes: new { @class = "control-label col-sm-3" })
+                <div class="col-sm-9 text-break">
+                    @{
+                        var appliedDate = Model.BillingDate != null ? Model.BillingDate.ToString("dd MMM yyyy") : "";
+                        <label class="control-label"> @appliedDate </label>
+                    }
+                    @*@Html.DisplayFor(model => model.BillingDate, new { htmlAttributes = new { @class = "form-control" } })*@
+                </div>
+            </div>
+
+            <div class="d-none" id="hours_outter">
+                <div class="form-group d-flex" id="">
+                    @Html.LabelFor(model => model.Hours, htmlAttributes: new { @class = "control-label col-sm-3" })
+                    <div class="col-sm-9 text-break">
+                        @Html.DisplayFor(model => model.Hours, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-none" id="amount_outter">
+                <div class="form-group d-flex">
+                    @Html.LabelFor(model => model.Amount, htmlAttributes: new { @class = "control-label col-sm-3" })
+                    <div class="col-sm-9 text-break">
+                        @Html.DisplayFor(model => model.Amount, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-right mt-2">
+                <div class="">
+                    <a href="#" class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Close</a>
+                    @*<input type="button" value="Save" id="btnSave" class="btn btn-primary" />*@
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.JobId, htmlAttributes: new { @class = "control-label" })
+                <div class="">
+                    @Html.DropDownListFor(x => Model.JobId, new SelectList(Model.Jobs, "Value", "Text", ""), "- Please select job", htmlAttributes: new { @class = "form-control", id = "ddlJobs" })
+                    @Html.ValidationMessageFor(model => model.JobId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BillingDate, htmlAttributes: new { @class = "control-label" })
+                <div class="">
+                    @Html.EditorFor(model => model.BillingDate, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group d-none" id="hours_outter">
+                @Html.LabelFor(model => model.Hours, htmlAttributes: new { @class = "control-label" })
+                <div class="">
+                    @Html.EditorFor(model => model.Hours, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Hours, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group d-none" id="amount_outter">
+                @Html.LabelFor(model => model.Amount, htmlAttributes: new { @class = "control-label" })
+                <div class="">
+                    @Html.EditorFor(model => model.Amount, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="text-right mt-2">
+                <div class="">
+                    <a href="#" class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</a>
+                    <input type="button" value="Save" id="btnSave" class="btn btn-primary" />
+                </div>
+            </div>
+        }
+    </div>
+<script>
+    $(document).ready(function () {
+        $("#BillingDate").datepicker({
+            autoclose: true,
+            format: "yyyy-mm-dd"
+        });
+        if ($("#Id").val() == 0) {
+            $("#BillingDate").val("");
+        }
+
+        //show hide during update
+        var projectType = $("#ProjectTypeId").val();
+        if (projectType == 1) {
+            $("#amount_outter").removeClass("d-none");
+        }
+        if (projectType == 2) {
+            $("#hours_outter").removeClass("d-none");
+        }
+
+        //find the job is hourly or fixed
+        $("#ddlJobs").on("change", function (e) {
+            loader();
+            var vm = {};
+            vm.Id = $(this).val();
+            var test = $(this).text();
+            $.ajax({
+                type: "GET",
+                url: "/Billing/GetProjectType",
+                dataType: "json",
+                contentType: "application/json",
+                data: { 'id': vm.Id },
+                success: function (result) {
+                    if (result.Success) {
+                        removeLoader();
+                        $("#ProjectTypeId").val(result.ProjectTypeId);
+                        $("#amount_outter").addClass("d-none");
+                        $("#hours_outter").addClass("d-none");
+
+                        if (result.ProjectTypeId == 1) {
+                            $("#amount_outter").removeClass("d-none");
+                        }
+                        if (result.ProjectTypeId == 2) {
+                            $("#hours_outter").removeClass("d-none");
+                        }
+                    }
+                    else {
+                        notificationHelper.ShowError("Sorry, An error occurred!");
+                        removeLoader();
+                    }
+                },
+                error: function () {
+                    removeLoader();
+                    notificationHelper.ShowError("Sorry, An error occurred!");
+                }
+            });
+        });
+    });
+
+    $("#Amount").keyup(function (evt) {
+        var self = $(this);
+        self.val(self.val().replace(/[^0-9\.]/g, ''));
+        if ((evt.which != 46 || self.val().indexOf('.') != -1) && (evt.which < 48 || evt.which > 57)) {
+            evt.preventDefault();
+        }
+    });
+
+    $("#Hours").keyup(function (evt) {
+        var self = $(this);
+        self.val(self.val().replace(/[^0-9\.]/g, ''));
+        if ((evt.which != 46 || self.val().indexOf('.') != -1) && (evt.which < 48 || evt.which > 57)) {
+            evt.preventDefault();
+        }
+    });
+
+    $("#btnSave").click(function () {
+        var hours = $("#Hours").val();
+        var jobId = $("#ddlJobs").val();
+        var Amount = $("#Amount").val();
+        var BillingDate = $("#BillingDate").val();
+        var projectTypeId = $("#ProjectTypeId").val();
+        var vm = {};
+        vm.Id = $("#Id").val();
+        vm.Hours = hours;
+        vm.JobId = jobId;
+        vm.Amount = Amount;
+        vm.BillingDate = BillingDate;
+        vm.ProjectTypeId = projectTypeId;
+        var validate = true;
+
+        if (jobId == undefined || jobId == "") {
+            validate = false;
+            $("#ddlJobs").addClass("error");
+        } else {
+            $("#ddlJobs").removeClass("error");
+        }
+        if (projectTypeId != undefined && projectTypeId != "" && projectTypeId != "0") {
+            if (projectTypeId == 2) {
+                if (hours == undefined || hours == "" || Amount == "0.00" || Amount == "0") {
+                    validate = false;
+                    $("#Hours").addClass("error");
+                } else {
+                    $("#Hours").removeClass("error");
+                }
+            }
+            if (projectTypeId == 1) {
+                if (Amount == undefined || Amount == "" || Amount == "0.00" || Amount == "0") {
+                    validate = false;
+                    $("#Amount").addClass("error");
+                } else {
+                    $("#Amount").removeClass("error");
+                }
+            }
+        }
+        if (BillingDate == undefined || BillingDate == "") {
+            validate = false;
+            $("#BillingDate").addClass("error");
+        } else {
+            $("#BillingDate").removeClass("error");
+        }
+
+        if (validate == true) {
+            loader();
+            $.ajax({
+                type: "Post",
+                url: "/Billing/InsertUpdate",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(vm),
+                success: function (result) {
+                    if (result.Success) {
+                        $('#myModal').hide();
+                        removeLoader();
+                        notificationHelper.ShowSuccess(result.Message);
+                        setTimeout(function () {
+                            location.href = "/Billing/Index";
+                        }, 1000);
+                    } else {
+                        notificationHelper.ShowError("Sorry, An error occurred!");
+                        removeLoader();
+                    }
+                },
+                failure: function (result) {
+                    removeLoader();
+                    notificationHelper.ShowError(result.responseText);
+                }
+            });
+        }
+
+    })
+
+</script>
